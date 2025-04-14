@@ -1,11 +1,7 @@
 streamlit
-torch
 opencv-python-headless
-numpy
-Pillow
-fpdf
-matplotlib
-gdown
-shapely
 geopandas
-detectron2 @ git+https://github.com/facebookresearch/detectron2.git
+shapely
+matplotlib
+fpdf
+requests
