@@ -2,6 +2,7 @@ streamlit
 opencv-python-headless
 geopandas
 shapely
-matplotlib
 fpdf
+matplotlib
 requests
+pillow==9.5.0
