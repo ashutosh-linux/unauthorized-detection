@@ -1,24 +1,24 @@
 FROM python:3.9-slim
 
-# ---------------------- SYSTEM DEPENDENCIES ----------------------
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    ffmpeg libsm6 libxext6 cmake gcc git curl wget build-essential python3-dev \
+    ffmpeg libsm6 libxext6 cmake gcc git curl wget build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# ---------------------- SETUP WORKDIR ----------------------
+# Set working directory
 WORKDIR /app
+
+# Copy files
 COPY . .
 
-# ---------------------- PYTHON PACKAGES ----------------------
+# Upgrade pip and install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install torch==1.13.0 torchvision==0.14.0 --index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch==1.10.0 torchvision==0.11.1 --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.10/index.html
 RUN pip install -r requirements.txt
 
-# ---------------------- INSTALL DETECTRON2 FROM SOURCE ----------------------
-RUN pip install cython
-RUN git clone https://github.com/facebookresearch/detectron2.git && \
-    pip install -e detectron2
-
-# ---------------------- FINAL SETUP ----------------------
+# Expose Streamlit default port
 EXPOSE 8501
+
+# Run the Streamlit app
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
