@@ -24,14 +24,14 @@ YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
 # ------------------ DOWNLOAD MODEL ------------------
 def download_and_extract_model():
     if not os.path.exists(MODEL_PATH):
-        st.info("Downloading trained model... Please wait ⏳")
+        st.info("📥 Downloading trained model... Please wait ⏳")
         response = requests.get(MODEL_URL)
         with open(ZIP_PATH, "wb") as f:
             f.write(response.content)
         with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall()
         os.remove(ZIP_PATH)
-        st.success("Model downloaded and extracted successfully ✅")
+        st.success("✅ Model downloaded and extracted successfully!")
 
 download_and_extract_model()
 
@@ -56,7 +56,7 @@ red_zone = gpd.read_file(RED_ZONE_PATH)
 yellow_zone = gpd.read_file(YELLOW_ZONE_PATH)
 
 # ------------------ IMAGE UPLOAD ------------------
-uploaded_file = st.file_uploader("Upload an aerial image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📤 Upload an aerial image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     tfile = tempfile.NamedTemporaryFile(delete=False)
@@ -65,7 +65,7 @@ if uploaded_file:
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     height, width = image.shape[:2]
 
-    st.image(image_rgb, caption="Original Image", use_column_width=True)
+    st.image(image_rgb, caption="🖼️ Original Image", use_column_width=True)
 
     outputs = predictor(image_rgb)
     instances = outputs["instances"].to("cpu")
@@ -102,7 +102,7 @@ if uploaded_file:
         if label == "Unauthorized":
             points.append([lon, lat])
 
-    st.image(overlay, caption="Detection Result", use_column_width=True)
+    st.image(overlay, caption="📌 Detection Result", use_column_width=True)
 
     # ------------------ HEATMAP ------------------
     if len(points) > 1:
@@ -117,7 +117,7 @@ if uploaded_file:
 
     # ------------------ PDF REPORT ------------------
     st.subheader("📄 Generate Report")
-    if st.button("Download PDF Report"):
+    if st.button("📥 Download PDF Report"):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -133,4 +133,4 @@ if uploaded_file:
         pdf.output(pdf_path)
 
         with open(pdf_path, "rb") as f:
-            st.download_button("📥 Download Report PDF", f, file_name="unauthorized_report.pdf")
+            st.download_button("⬇️ Download Report PDF", f, file_name="unauthorized_report.pdf")
