@@ -11,18 +11,20 @@ WORKDIR /app
 # Copy all files
 COPY . .
 
-# Upgrade pip and install torch
+# Upgrade pip and install core Python libs
 RUN pip install --upgrade pip
+
+# Install PyTorch CPU
 RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Install detectron2 from pre-built wheel (CPU version)
-RUN pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu113/torch1.10/index.html
+# Install Detectron2 (CPU)
+RUN pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch2.0/index.html
 
-# Install the rest of the requirements
+# Install other dependencies
 RUN pip install -r requirements.txt
 
-# Expose port
+# Expose Streamlit port
 EXPOSE 8501
 
-# Start Streamlit
+# Start the Streamlit app
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
