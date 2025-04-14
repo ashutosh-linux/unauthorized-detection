@@ -24,7 +24,7 @@ YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
 # ------------------ DOWNLOAD MODEL ------------------
 def download_and_extract_model():
     if not os.path.exists(MODEL_PATH):
-        st.info("📥 Downloading trained model... Please wait ⏳")
+        st.info("\U0001F4E5 Downloading trained model... Please wait ⌛")
         response = requests.get(MODEL_URL)
         with open(ZIP_PATH, "wb") as f:
             f.write(response.content)
@@ -56,7 +56,7 @@ red_zone = gpd.read_file(RED_ZONE_PATH)
 yellow_zone = gpd.read_file(YELLOW_ZONE_PATH)
 
 # ------------------ IMAGE UPLOAD ------------------
-uploaded_file = st.file_uploader("📤 Upload an aerial image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("\U0001F4E4 Upload an aerial image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     tfile = tempfile.NamedTemporaryFile(delete=False)
@@ -117,7 +117,7 @@ if uploaded_file:
 
     # ------------------ PDF REPORT ------------------
     st.subheader("📄 Generate Report")
-    if st.button("📥 Download PDF Report"):
+    if st.button("📅 Download PDF Report"):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
