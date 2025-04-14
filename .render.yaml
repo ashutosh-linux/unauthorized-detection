@@ -1,0 +1,7 @@
+
+services:
+  - type: web
+    name: unauthorized-detection
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
