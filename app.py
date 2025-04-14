@@ -15,10 +15,12 @@ from fpdf import FPDF
 import matplotlib.pyplot as plt
 
 # ------------------ CONFIG ------------------
-MODEL_PATH = "model_final.pth"
 import gdown
+
+MODEL_PATH = "model_final.pth"
 if not os.path.exists(MODEL_PATH):
-    gdown.download('https://drive.google.com/uc?id=1lAQfN-7JB_WoYWO0L-cq_EtWdxsWjExQ', output=MODEL_PATH, quiet=False)
+    # ✅ Fixed: Proper public file format for gdown
+    gdown.download("https://drive.google.com/uc?id=1lAQfN-7JB_WoYWO0L-cq_EtWdxsWjExQ", output=MODEL_PATH, quiet=False)
 RED_ZONE_PATH = "red_zone_real.geojson"
 YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
 
