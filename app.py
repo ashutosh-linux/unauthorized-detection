@@ -7,8 +7,6 @@ import os
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2 import model_zoo
-from detectron2.utils.visualizer import Visualizer
-from detectron2.data import MetadataCatalog
 import geopandas as gpd
 from shapely.geometry import Point
 from fpdf import FPDF
@@ -17,8 +15,8 @@ import zipfile
 import requests
 
 # ------------------ CONFIG ------------------
-MODEL_URL = "https://github.com/ashutosh-linux/unauthorized-detection/releases/download/v1.0/model_final1.zip"
-ZIP_PATH = "model_final1.zip"
+MODEL_URL = "https://github.com/ashutosh-linux/unauthorized-detection/releases/download/v2.0/model_final.zip"
+ZIP_PATH = "model_final.zip"
 MODEL_PATH = "model_final.pth"
 RED_ZONE_PATH = "red_zone_real.geojson"
 YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
@@ -30,10 +28,8 @@ def download_and_extract_model():
         response = requests.get(MODEL_URL)
         with open(ZIP_PATH, "wb") as f:
             f.write(response.content)
-
         with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall()
-
         os.remove(ZIP_PATH)
         st.success("Model downloaded and extracted successfully ✅")
 
@@ -41,7 +37,7 @@ download_and_extract_model()
 
 # ------------------ STREAMLIT CONFIG ------------------
 st.set_page_config(page_title="Unauthorized Construction Detector", layout="wide")
-st.title("\U0001F3D7️ AI-Powered Unauthorized Construction Detection")
+st.title("🏗️ AI-Powered Unauthorized Construction Detection")
 
 # ------------------ LOAD MODEL ------------------
 @st.cache_resource
@@ -110,7 +106,7 @@ if uploaded_file:
 
     # ------------------ HEATMAP ------------------
     if len(points) > 1:
-        st.subheader("\U0001F525 Unauthorized Construction Hotspot Map")
+        st.subheader("🔥 Unauthorized Construction Hotspot Map")
         heat_df = np.array(points)
         fig, ax = plt.subplots(figsize=(10, 6))
         plt.hexbin(heat_df[:, 0], heat_df[:, 1], gridsize=30, cmap="Reds", mincnt=1)
@@ -120,14 +116,14 @@ if uploaded_file:
         st.pyplot(fig)
 
     # ------------------ PDF REPORT ------------------
-    st.subheader("\U0001F4C4 Generate Report")
+    st.subheader("📄 Generate Report")
     if st.button("Download PDF Report"):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
         pdf.cell(200, 10, txt="Unauthorized Construction Detection Report", ln=True, align="C")
-        pdf.cell(200, 10, txt="Authorized Buildings: {}".format(authorized), ln=True)
-        pdf.cell(200, 10, txt="Unauthorized Buildings: {}".format(unauthorized), ln=True)
+        pdf.cell(200, 10, txt=f"Authorized Buildings: {authorized}", ln=True)
+        pdf.cell(200, 10, txt=f"Unauthorized Buildings: {unauthorized}", ln=True)
 
         overlay_path = os.path.join(tempfile.gettempdir(), "overlayed.jpg")
         cv2.imwrite(overlay_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
@@ -137,4 +133,4 @@ if uploaded_file:
         pdf.output(pdf_path)
 
         with open(pdf_path, "rb") as f:
-            st.download_button("\U0001F4E5 Download Report PDF", f, file_name="unauthorized_report.pdf")
+            st.download_button("📥 Download Report PDF", f, file_name="unauthorized_report.pdf")
