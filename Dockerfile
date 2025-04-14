@@ -8,17 +8,17 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy files
+# Copy all files
 COPY . .
 
-# Upgrade pip and install Python dependencies
+# Install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install torch==1.10.0 torchvision==0.11.1 --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch==1.10.0 torchvision==0.11.1 --index-url https://download.pytorch.org/whl/cpu
 RUN pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.10/index.html
 RUN pip install -r requirements.txt
 
-# Expose Streamlit default port
+# Expose Streamlit port
 EXPOSE 8501
 
-# Run the Streamlit app
+# Start app
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
