@@ -11,11 +11,31 @@ import geopandas as gpd
 from shapely.geometry import Point
 from fpdf import FPDF
 import matplotlib.pyplot as plt
+import zipfile
+import requests
 
 # ------------------ CONFIG ------------------
+MODEL_URL = "https://github.com/ashutosh-linux/unauthorized-detection/releases/download/v2.0/model_final.zip"
+ZIP_PATH = "model_final.zip"
 MODEL_PATH = "model_final.pth"
 RED_ZONE_PATH = "red_zone_real.geojson"
 YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
+
+# ------------------ DOWNLOAD MODEL IF NEEDED ------------------
+@st.cache_resource
+def download_and_extract_model():
+    if not os.path.exists(MODEL_PATH):
+        st.info("\U0001F4E5 Downloading trained model... Please wait ⌛")
+        response = requests.get(MODEL_URL, timeout=60)
+        with open(ZIP_PATH, "wb") as f:
+            f.write(response.content)
+        with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
+            zip_ref.extractall()
+        os.remove(ZIP_PATH)
+        st.success("✅ Model downloaded and extracted successfully!")
+
+# Trigger download at app startup
+download_and_extract_model()
 
 # ------------------ STREAMLIT CONFIG ------------------
 st.set_page_config(page_title="Unauthorized Construction Detector", layout="wide")
