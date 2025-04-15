@@ -30,13 +30,14 @@ st.title("🏗️ AI-Powered Unauthorized Construction Detection")
 def download_and_extract_model():
     if not os.path.exists(MODEL_PATH):
         st.info("📥 Downloading trained model... Please wait ⏳")
-        r = requests.get(MODEL_URL)
+        response = requests.get(MODEL_URL, timeout=60)  # ← updated line
         with open(ZIP_PATH, "wb") as f:
-            f.write(r.content)
-        with zipfile.ZipFile(ZIP_PATH, "r") as zip_ref:
+            f.write(response.content)
+        with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall()
         os.remove(ZIP_PATH)
         st.success("✅ Model downloaded and extracted successfully!")
+
 
 download_and_extract_model()
 
