@@ -21,23 +21,24 @@ MODEL_PATH = "model_final.pth"
 RED_ZONE_PATH = "red_zone_real.geojson"
 YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
 
+# ------------------ STREAMLIT CONFIG ------------------
+st.set_page_config(page_title="Unauthorized Construction Detector", layout="wide")
+st.title("🏗️ AI-Powered Unauthorized Construction Detection")
+
 # ------------------ DOWNLOAD MODEL ------------------
+@st.cache_resource
 def download_and_extract_model():
     if not os.path.exists(MODEL_PATH):
-        st.info("\U0001F4E5 Downloading trained model... Please wait ⌛")
-        response = requests.get(MODEL_URL)
+        st.info("📥 Downloading trained model... Please wait ⏳")
+        r = requests.get(MODEL_URL)
         with open(ZIP_PATH, "wb") as f:
-            f.write(response.content)
-        with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
+            f.write(r.content)
+        with zipfile.ZipFile(ZIP_PATH, "r") as zip_ref:
             zip_ref.extractall()
         os.remove(ZIP_PATH)
         st.success("✅ Model downloaded and extracted successfully!")
 
 download_and_extract_model()
-
-# ------------------ STREAMLIT CONFIG ------------------
-st.set_page_config(page_title="Unauthorized Construction Detector", layout="wide")
-st.title("🏗️ AI-Powered Unauthorized Construction Detection")
 
 # ------------------ LOAD MODEL ------------------
 @st.cache_resource
@@ -56,7 +57,7 @@ red_zone = gpd.read_file(RED_ZONE_PATH)
 yellow_zone = gpd.read_file(YELLOW_ZONE_PATH)
 
 # ------------------ IMAGE UPLOAD ------------------
-uploaded_file = st.file_uploader("\U0001F4E4 Upload an aerial image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📤 Upload an aerial image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     tfile = tempfile.NamedTemporaryFile(delete=False)
