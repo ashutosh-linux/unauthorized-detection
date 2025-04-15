@@ -12,6 +12,7 @@ COPY . .
 # ------------------ Download and extract model_final.zip ------------------
 RUN curl -L -o model_final.zip https://github.com/ashutosh-linux/unauthorized-detection/releases/download/v2.0/model_final.zip && \
     unzip model_final.zip && \
+    ls -lh && echo "🧠 MODEL FILE STATUS:" && ls -lh model_final.pth || echo "❌ model_final.pth MISSING" && \
     rm model_final.zip
 
 # ------------------ Install Python dependencies ------------------
