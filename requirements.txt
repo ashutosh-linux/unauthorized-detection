@@ -1,11 +1,11 @@
 streamlit
 torch==1.10.0
 torchvision==0.11.1
-numpy==1.23.5
 opencv-python-headless
 geopandas
 shapely
 fpdf
 matplotlib
 requests
-Pillow==9.5.0
+pillow==9.5.0
+git+https://github.com/facebookresearch/detectron2.git@main
