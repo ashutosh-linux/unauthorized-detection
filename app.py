@@ -21,9 +21,6 @@ MODEL_PATH = "model_final.pth"
 RED_ZONE_PATH = "red_zone_clean.geojson"
 YELLOW_ZONE_PATH = "yellow_zone_clean.geojson"
 
-
-
-
 # ------------------ DOWNLOAD MODEL IF NOT EXISTS ------------------
 def download_model():
     if not os.path.exists(MODEL_PATH):
@@ -56,6 +53,13 @@ def load_model():
 predictor = load_model()
 
 # ------------------ LOAD ZONES ------------------
+if not os.path.exists(RED_ZONE_PATH):
+    st.error(f"Missing file: {RED_ZONE_PATH}")
+    st.stop()
+if not os.path.exists(YELLOW_ZONE_PATH):
+    st.error(f"Missing file: {YELLOW_ZONE_PATH}")
+    st.stop()
+
 red_zone = gpd.read_file(RED_ZONE_PATH)
 yellow_zone = gpd.read_file(YELLOW_ZONE_PATH)
 
