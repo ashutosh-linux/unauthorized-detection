@@ -64,17 +64,14 @@ except Exception as e:
 uploaded_file = st.file_uploader("📤 Upload an aerial image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    tfile = tempfile.NamedTemporaryFile(delete=False)
+    tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
     tfile.write(uploaded_file.read())
-
-    # Read image
     image = cv2.imread(tfile.name)
 
     if image is None:
         st.error("❌ Error: Could not load the image. Please upload a valid JPG/PNG file.")
         st.stop()
 
-    # Ensure valid dtype
     if image.dtype != np.uint8:
         if image.max() <= 1.0:
             image = (255 * image).astype("uint8")
@@ -86,8 +83,12 @@ if uploaded_file:
 
     st.image(image_rgb, caption="🖼️ Original Image", use_column_width=True)
 
-    # Detect
-    outputs = predictor(image_rgb)
+    try:
+        outputs = predictor(image_rgb)
+    except Exception as e:
+        st.error(f"🔥 Model Prediction Failed: {e}")
+        st.stop()
+
     instances = outputs["instances"].to("cpu")
     boxes = instances.pred_boxes.tensor.numpy()
 
@@ -124,7 +125,6 @@ if uploaded_file:
 
     st.image(overlay, caption="📌 Detection Result", use_column_width=True)
 
-    # ------------------ HEATMAP ------------------
     if len(points) > 1:
         st.subheader("🔥 Unauthorized Construction Hotspot Map")
         heat_df = np.array(points)
@@ -135,7 +135,6 @@ if uploaded_file:
         plt.ylabel("Latitude")
         st.pyplot(fig)
 
-    # ------------------ PDF REPORT ------------------
     st.subheader("📄 Generate Report")
     if st.button("📅 Download PDF Report"):
         pdf = FPDF()
