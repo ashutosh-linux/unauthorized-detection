@@ -4,6 +4,8 @@ import numpy as np
 import tempfile
 import torch
 import os
+import zipfile
+import requests
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2 import model_zoo
@@ -11,8 +13,6 @@ import geopandas as gpd
 from shapely.geometry import Point
 from fpdf import FPDF
 import matplotlib.pyplot as plt
-import zipfile
-import requests
 
 # ------------------ CONFIG ------------------
 MODEL_URL = "https://github.com/ashutosh-linux/unauthorized-detection/releases/download/v2.0/model_final.zip"
@@ -24,18 +24,18 @@ YELLOW_ZONE_PATH = "yellow_zone_clean.geojson"
 # ------------------ DOWNLOAD MODEL IF NOT EXISTS ------------------
 def download_model():
     if not os.path.exists(MODEL_PATH):
-        st.info("\U0001F4E5 Downloading trained model... Please wait ⌛")
+        st.info("📦 Downloading trained model...")
         response = requests.get(MODEL_URL, timeout=60)
         with open(ZIP_PATH, "wb") as f:
             f.write(response.content)
         with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall()
         os.remove(ZIP_PATH)
-        st.success("✅ Model downloaded and extracted successfully!")
+        st.success("✅ Model downloaded and extracted!")
 
 # ------------------ STREAMLIT CONFIG ------------------
 st.set_page_config(page_title="Unauthorized Construction Detector", layout="wide")
-st.title("\U0001F3D7️ AI-Powered Unauthorized Construction Detection")
+st.title("🏗️ AI-Powered Unauthorized Construction Detection")
 
 # ------------------ INITIALIZE ------------------
 download_model()
@@ -53,18 +53,15 @@ def load_model():
 predictor = load_model()
 
 # ------------------ LOAD ZONES ------------------
-if not os.path.exists(RED_ZONE_PATH):
-    st.error(f"Missing file: {RED_ZONE_PATH}")
+try:
+    red_zone = gpd.read_file(RED_ZONE_PATH)
+    yellow_zone = gpd.read_file(YELLOW_ZONE_PATH)
+except Exception as e:
+    st.error(f"GeoJSON Load Error: {e}")
     st.stop()
-if not os.path.exists(YELLOW_ZONE_PATH):
-    st.error(f"Missing file: {YELLOW_ZONE_PATH}")
-    st.stop()
-
-red_zone = gpd.read_file(RED_ZONE_PATH)
-yellow_zone = gpd.read_file(YELLOW_ZONE_PATH)
 
 # ------------------ IMAGE UPLOAD ------------------
-uploaded_file = st.file_uploader("\U0001F4E4 Upload an aerial image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📤 Upload an aerial image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     tfile = tempfile.NamedTemporaryFile(delete=False)
@@ -73,7 +70,7 @@ if uploaded_file:
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     height, width = image.shape[:2]
 
-    st.image(image_rgb, caption="\U0001F5BC️ Original Image", use_column_width=True)
+    st.image(image_rgb, caption="🖼️ Original Image", use_column_width=True)
 
     outputs = predictor(image_rgb)
     instances = outputs["instances"].to("cpu")
@@ -110,11 +107,11 @@ if uploaded_file:
         if label == "Unauthorized":
             points.append([lon, lat])
 
-    st.image(overlay, caption="\U0001F4CC Detection Result", use_column_width=True)
+    st.image(overlay, caption="📌 Detection Result", use_column_width=True)
 
     # ------------------ HEATMAP ------------------
     if len(points) > 1:
-        st.subheader("\U0001F525 Unauthorized Construction Hotspot Map")
+        st.subheader("🔥 Unauthorized Construction Hotspot Map")
         heat_df = np.array(points)
         fig, ax = plt.subplots(figsize=(10, 6))
         plt.hexbin(heat_df[:, 0], heat_df[:, 1], gridsize=30, cmap="Reds", mincnt=1)
@@ -124,8 +121,8 @@ if uploaded_file:
         st.pyplot(fig)
 
     # ------------------ PDF REPORT ------------------
-    st.subheader("\U0001F4C4 Generate Report")
-    if st.button("\U0001F4C5 Download PDF Report"):
+    st.subheader("📄 Generate Report")
+    if st.button("📅 Download PDF Report"):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
