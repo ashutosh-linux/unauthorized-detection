@@ -24,7 +24,7 @@ YELLOW_ZONE_PATH = "yellow_zone_clean.geojson"
 # ------------------ DOWNLOAD MODEL IF NOT EXISTS ------------------
 def download_model():
     if not os.path.exists(MODEL_PATH):
-        st.info("📦 Downloading trained model...")
+        st.info("📦 Downloading trained model... Please wait")
         response = requests.get(MODEL_URL, timeout=60)
         with open(ZIP_PATH, "wb") as f:
             f.write(response.content)
@@ -68,6 +68,7 @@ if uploaded_file:
     tfile.write(uploaded_file.read())
     image = cv2.imread(tfile.name)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image_rgb = image_rgb.astype("uint8")  # ✅ FIXED: Ensure valid dtype for Detectron2
     height, width = image.shape[:2]
 
     st.image(image_rgb, caption="🖼️ Original Image", use_column_width=True)
