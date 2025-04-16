@@ -18,8 +18,11 @@ import requests
 MODEL_URL = "https://github.com/ashutosh-linux/unauthorized-detection/releases/download/v2.0/model_final.zip"
 ZIP_PATH = "model_final.zip"
 MODEL_PATH = "model_final.pth"
-RED_ZONE_PATH = "red_zone_real.geojson"
-YELLOW_ZONE_PATH = "yellow_zone_real.geojson"
+RED_ZONE_PATH = "red_zone_clean.geojson"
+YELLOW_ZONE_PATH = "yellow_zone_clean.geojson"
+
+
+
 
 # ------------------ DOWNLOAD MODEL IF NOT EXISTS ------------------
 def download_model():
