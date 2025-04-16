@@ -24,7 +24,7 @@ YELLOW_ZONE_PATH = "yellow_zone_clean.geojson"
 # ------------------ DOWNLOAD MODEL IF NOT EXISTS ------------------
 def download_model():
     if not os.path.exists(MODEL_PATH):
-        st.info("📦 Downloading trained model... Please wait")
+        st.info("📦 Downloading trained model...")
         response = requests.get(MODEL_URL, timeout=60)
         with open(ZIP_PATH, "wb") as f:
             f.write(response.content)
@@ -66,13 +66,27 @@ uploaded_file = st.file_uploader("📤 Upload an aerial image", type=["jpg", "jp
 if uploaded_file:
     tfile = tempfile.NamedTemporaryFile(delete=False)
     tfile.write(uploaded_file.read())
+
+    # Read image
     image = cv2.imread(tfile.name)
+
+    if image is None:
+        st.error("❌ Error: Could not load the image. Please upload a valid JPG/PNG file.")
+        st.stop()
+
+    # Ensure valid dtype
+    if image.dtype != np.uint8:
+        if image.max() <= 1.0:
+            image = (255 * image).astype("uint8")
+        else:
+            image = image.astype("uint8")
+
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image_rgb = image_rgb.astype("uint8")  # ✅ FIXED: Ensure valid dtype for Detectron2
     height, width = image.shape[:2]
 
     st.image(image_rgb, caption="🖼️ Original Image", use_column_width=True)
 
+    # Detect
     outputs = predictor(image_rgb)
     instances = outputs["instances"].to("cpu")
     boxes = instances.pred_boxes.tensor.numpy()
